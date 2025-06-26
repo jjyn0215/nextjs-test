@@ -5,7 +5,7 @@ export type ServerStatusData = {
   status: 'online' | 'degraded' | 'offline'; // 전체 상태 (모두 온라인/일부 온라인/모두 오프라인)
   servers: Array<{
     name: string;
-    url: string;
+    // url 필드는 보안상의 이유로 클라이언트에 전송하지 않음
     online: boolean;
     responseTime?: number; // 응답 시간(ms)
     statusCode?: number;   // HTTP 상태 코드
@@ -13,19 +13,19 @@ export type ServerStatusData = {
   }>;
 };
 
-// 서버 목록 정의 (실제 환경에서는 환경변수나 데이터베이스에서 관리할 수 있음)
+// 환경변수에서 서버 목록 가져오기
 const servers = [
   { 
-    name: 'Proxmox', 
-    url: 'https://mox.salmakis.online' // 테스트용 URL
+    name: process.env.SERVER_1_NAME || 'Server 1', 
+    url: process.env.SERVER_1_URL || 'https://example.com'
   },
   { 
-    name: 'Home Assistant', 
-    url: 'https://hass.salmakis.online' // 테스트용 URL
+    name: process.env.SERVER_2_NAME || 'Server 2', 
+    url: process.env.SERVER_2_URL || 'https://example.com'
   },
   { 
-    name: 'Synology NAS', 
-    url: 'https://nas.salmakis.online' // 테스트용 URL
+    name: process.env.SERVER_3_NAME || 'Server 3', 
+    url: process.env.SERVER_3_URL || 'https://example.com'
   }
 ];
 
@@ -40,9 +40,10 @@ async function checkServerStatus(serverUrl: string): Promise<{
   const startTime = Date.now();
   
   try {
-    // 5초 타임아웃 설정
+    // 환경 변수에서 타임아웃 설정 가져오기 (기본값: 5000ms)
+    const timeout = parseInt(process.env.API_TIMEOUT || '5000', 10);
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
     
     const response = await fetch(serverUrl, { 
       method: 'GET', // GET 요청으로 변경 (HEAD 요청이 에러 발생)
@@ -78,7 +79,7 @@ async function checkAllServers(): Promise<ServerStatusData> {
     
     return {
       name: server.name,
-      url: server.url,
+      // URL은 보안상의 이유로 클라이언트에게 전송하지 않음
       online: status.online,
       responseTime: status.responseTime,
       statusCode: status.statusCode,

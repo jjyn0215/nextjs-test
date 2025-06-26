@@ -3,14 +3,38 @@ name: Docker Build and Deploy
 on:
   push:
     branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  build-and-push:
+  lint:
     runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run ESLint
+      run: npm run lint
+  
+  build-and-push:
+    needs: lint
+    runs-on: ubuntu-latest
+    # PR에서는 Docker 이미지를 빌드만 하고 푸시하지 않음
+    if: github.event_name != 'pull_request'
     permissions:
       contents: read
       packages: write
@@ -43,7 +67,7 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         context: .
-        push: true
+        push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha
@@ -68,6 +92,7 @@ jobs:
           echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
           docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           cd ~/
+          echo "${{ secrets.ENV_PRODUCTION }}" > .env.production
           docker compose down || true
           docker compose up -d
           docker image prune -f

@@ -1,130 +1,127 @@
-import Image from "next/image";
-import Link from "next/link";
+import { Metadata } from 'next';
+import type { ServerStatusData } from './api/server-status/route';
+import AutoRefresh from '@/components/AutoRefresh';
 
-export default function Home() {
+export const metadata: Metadata = {
+  title: process.env.APP_NAME || '서버 상태 대시보드',
+  description: '서버 온라인 상태 확인 대시보드',
+  applicationName: process.env.APP_NAME,
+  generator: `서버 모니터링 대시보드 v${process.env.APP_VERSION || '1.0.0'}`,
+};
+
+// 최대 30초마다 데이터 재검증 (SSR) - 환경변수에서 가져옴
+export const revalidate = parseInt(process.env.CHECK_INTERVAL || '30', 10);
+
+async function getServerStatus(): Promise<ServerStatusData> {
+  // 실제 환경에서는 절대 URL 사용
+  const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
+  const host = process.env.URL;
+  
+  const res = await fetch(`${protocol}://${host}/api/server-status`, {
+    cache: 'no-store', // 매번 새로운 데이터 가져오기
+  });
+  
+  if (!res.ok) {
+    // 에러 발생 시 기본값 반환
+    return {
+      status: 'offline',
+      servers: [
+        {
+          name: '서버 상태 확인 불가',
+          online: false,
+          lastChecked: new Date().toISOString().replace('T', ' ').substring(0, 19)
+        }
+      ]
+    };
+  }
+  
+  return res.json();
+}
+
+export default async function HomePage() {
+  const serverStatus = await getServerStatus();
+  const lastCheckedTime = serverStatus.servers[0]?.lastChecked || '정보 없음';
+  
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <Link
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="/dashboard"
-          >
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              width="20" 
-              height="20" 
-              viewBox="0 0 24 24" 
-              fill="none" 
-              stroke="currentColor" 
-              strokeWidth="2" 
-              strokeLinecap="round" 
-              strokeLinejoin="round"
-            >
-              <rect x="3" y="3" width="18" height="18" rx="2" />
-              <line x1="9" y1="3" x2="9" y2="21" />
-              <path d="M13 8h.01" />
-              <path d="M17 8h.01" />
-              <path d="M13 12h.01" />
-              <path d="M17 12h.01" />
-              <path d="M13 16h.01" />
-              <path d="M17 16h.01" />
-            </svg>
-            서버 상태 대시보드
-          </Link>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
+    <main className="flex min-h-screen flex-col items-center justify-center p-8">
+      {/* 환경 변수에 설정된 간격으로 클라이언트 사이드에서 데이터 새로고침 */}
+      <AutoRefresh interval={parseInt(process.env.CHECK_INTERVAL || '30', 10)} />
+      
+      <div className="w-full max-w-3xl bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+        <h1 className="text-3xl font-bold mb-8 text-center">서버 상태</h1>
+        
+        <div className="mb-8 text-center">
+          {serverStatus.status === 'online' && (
+            <div className="inline-flex items-center px-6 py-3 rounded-full text-white text-xl font-bold bg-green-500">
+              <div className="w-4 h-4 rounded-full mr-3 bg-green-200 animate-pulse"></div>
+              온라인
+            </div>
+          )}
+          
+          {serverStatus.status === 'degraded' && (
+            <div className="inline-flex items-center px-6 py-3 rounded-full text-white text-xl font-bold bg-yellow-500">
+              <div className="w-4 h-4 rounded-full mr-3 bg-yellow-200 animate-pulse"></div>
+              성능 저하
+            </div>
+          )}
+          
+          {serverStatus.status === 'offline' && (
+            <div className="inline-flex items-center px-6 py-3 rounded-full text-white text-xl font-bold bg-red-500">
+              <div className="w-4 h-4 rounded-full mr-3 bg-red-200"></div>
+              오프라인
+            </div>
+          )}
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+
+        <div className="mb-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
+          <h2 className="font-medium mb-2">서비스 가용성 요약</h2>
+          <div className="flex items-center justify-between text-sm">
+            <div>온라인 서비스</div>
+            <div className="font-medium">{serverStatus.servers.filter(s => s.online).length}/{serverStatus.servers.length}</div>
+          </div>
+          <div className="w-full bg-gray-300 dark:bg-gray-600 h-2 rounded-full mt-2">
+            <div 
+              className={`h-2 rounded-full ${
+                serverStatus.status === 'online' ? 'bg-green-500' : 
+                serverStatus.status === 'degraded' ? 'bg-yellow-500' : 'bg-red-500'
+              }`}
+              style={{ width: `${(serverStatus.servers.filter(s => s.online).length / serverStatus.servers.length) * 100}%` }}
+            ></div>
+          </div>
+        </div>
+        
+        <div className="space-y-4">
+          {serverStatus.servers.map((server, index) => (
+            <div 
+              key={index} 
+              className="p-4 border rounded-lg"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <div className="font-medium">{server.name}</div>
+                <div 
+                  className={`px-3 py-1 rounded-full text-white text-sm font-medium ${server.online ? 'bg-green-500' : 'bg-red-500'}`}
+                >
+                  {server.online ? '온라인' : '오프라인'}
+                </div>
+              </div>
+              
+              {/* 추가 정보 */}
+              <div className="text-sm text-gray-500 mt-2">
+                {server.responseTime !== undefined && (
+                  <div>응답 시간: {server.responseTime}ms</div>
+                )}
+                {server.statusCode !== undefined && (
+                  <div>상태 코드: {server.statusCode}</div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        <div className="mt-8 pt-4 text-sm text-gray-500 border-t">
+          마지막 확인: {lastCheckedTime}
+        </div>
+      </div>
+    </main>
   );
 }
