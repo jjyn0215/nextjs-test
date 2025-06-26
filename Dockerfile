@@ -1,6 +1,7 @@
 # Next.js 앱용 멀티스테이지 빌드
 FROM node:18-alpine AS base
 
+RUN apk --no-cache add curl
 # 의존성 설치용 스테이지
 FROM base AS deps
 RUN apk add --no-cache libc6-compat
