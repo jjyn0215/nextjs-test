@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  nextjs-app:
+    # 여기서 your-username/your-repo-name을 실제 GitHub 저장소 이름으로 변경
+    image: ghcr.io/jjyn0215/nextjs:latest
+    ports:
+      - "3333:3000"  # 외부포트:내부포트
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
+      # Next.js 환경변수들 (필요시 추가)
+      # - NEXT_PUBLIC_API_URL=https://api.yourdomain.com
+      # - DATABASE_URL=your-db-url
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
