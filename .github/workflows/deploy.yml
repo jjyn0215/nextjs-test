@@ -53,6 +53,8 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
+    permissions: 
+      contents: none
     
     steps:
     - name: Deploy to server
