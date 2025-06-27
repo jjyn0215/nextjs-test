@@ -1,6 +1,9 @@
 import { Metadata } from 'next';
 import type { ServerStatusData } from './api/server-status/route';
 import AutoRefresh from '@/components/AutoRefresh';
+import StatusIndicator from '@/components/StatusIndicator';
+import StatusBar from '@/components/StatusBar';
+import ServerCard from '@/components/ServerCard';
 
 export const metadata: Metadata = {
   title: process.env.APP_NAME || '서버 상태',
@@ -41,87 +44,71 @@ async function getServerStatus(): Promise<ServerStatusData> {
 export default async function HomePage() {
   const serverStatus = await getServerStatus();
   const lastCheckedTime = serverStatus.servers[0]?.lastChecked || '정보 없음';
+  const onlineServersCount = serverStatus.servers.filter(s => s.online).length;
   
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-8">
+    <main className="flex min-h-screen flex-col items-center justify-between p-4 md:p-8 bg-gradient-to-b from-background to-background/80">
       {/* 환경 변수에 설정된 간격으로 클라이언트 사이드에서 데이터 새로고침 */}
       <AutoRefresh interval={parseInt(process.env.CHECK_INTERVAL || '30', 10)} />
       
-      <div className="w-full max-w-3xl bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-        <h1 className="text-3xl font-bold mb-8 text-center">서버 상태</h1>
-        
-        <div className="mb-8 text-center">
-          {serverStatus.status === 'online' && (
-            <div className="inline-flex items-center px-6 py-3 rounded-full text-white text-xl font-bold bg-green-500">
-              <div className="w-4 h-4 rounded-full mr-3 bg-green-200 animate-pulse"></div>
-              온라인
-            </div>
-          )}
+      {/* 상단 데코레이션 */}
+      <div className="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-blue-500/10 to-transparent -z-10" />
+      
+      <div className="w-full max-w-4xl">
+        <div className="relative bg-gradient-to-b from-white to-white/90 dark:from-gray-800 dark:to-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-6 md:p-8 overflow-hidden">
+          {/* 배경 블러 효과 */}
+          <div className="absolute -top-96 -left-32 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+          <div className="absolute -bottom-64 -right-32 w-96 h-96 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob animation-delay-2000"></div>
           
-          {serverStatus.status === 'degraded' && (
-            <div className="inline-flex items-center px-6 py-3 rounded-full text-white text-xl font-bold bg-yellow-500">
-              <div className="w-4 h-4 rounded-full mr-3 bg-yellow-200 animate-pulse"></div>
-              성능 저하
-            </div>
-          )}
+          <header className="flex flex-col md:flex-row justify-between items-center mb-10">
+            <h1 className="text-4xl font-bold text-center md:text-left bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-400 dark:to-blue-600 bg-clip-text text-transparent">
+              서버 상태
+            </h1>
+          </header>
           
-          {serverStatus.status === 'offline' && (
-            <div className="inline-flex items-center px-6 py-3 rounded-full text-white text-xl font-bold bg-red-500">
-              <div className="w-4 h-4 rounded-full mr-3 bg-red-200"></div>
-              오프라인
-            </div>
-          )}
-        </div>
+          <div className="mb-12 text-center relative">
+            <StatusIndicator status={serverStatus.status} />
+          </div>
 
-        <div className="mb-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
-          <h2 className="font-medium mb-2">서비스 가용성 요약</h2>
-          <div className="flex items-center justify-between text-sm">
-            <div>온라인 서비스</div>
-            <div className="font-medium">{serverStatus.servers.filter(s => s.online).length}/{serverStatus.servers.length}</div>
-          </div>
-          <div className="w-full bg-gray-300 dark:bg-gray-600 h-2 rounded-full mt-2">
-            <div 
-              className={`h-2 rounded-full ${
-                serverStatus.status === 'online' ? 'bg-green-500' : 
-                serverStatus.status === 'degraded' ? 'bg-yellow-500' : 'bg-red-500'
-              }`}
-              style={{ width: `${(serverStatus.servers.filter(s => s.online).length / serverStatus.servers.length) * 100}%` }}
-            ></div>
-          </div>
-        </div>
-        
-        <div className="space-y-4">
-          {serverStatus.servers.map((server, index) => (
-            <div 
-              key={index} 
-              className="p-4 border rounded-lg"
-            >
-              <div className="flex items-center justify-between mb-2">
-                <div className="font-medium">{server.name}</div>
-                <div 
-                  className={`px-3 py-1 rounded-full text-white text-sm font-medium ${server.online ? 'bg-green-500' : 'bg-red-500'}`}
-                >
-                  {server.online ? '온라인' : '오프라인'}
+          <div className="mb-8 p-5 bg-gray-50 dark:bg-gray-900/50 rounded-xl backdrop-blur-sm shadow-inner">
+            <div className="flex flex-col md:flex-row md:items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold mb-2 md:mb-0">서비스 가용성 요약</h2>
+              
+              <div className="flex items-center bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow-sm">
+                <div className="text-sm text-gray-600 dark:text-gray-300 mr-3">온라인 서비스</div>
+                <div className="text-lg font-bold bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-400 dark:to-blue-600 bg-clip-text text-transparent">
+                  {onlineServersCount}/{serverStatus.servers.length}
                 </div>
               </div>
-              
-              {/* 추가 정보 */}
-              <div className="text-sm text-gray-500 mt-2">
-                {server.responseTime !== undefined && (
-                  <div>응답 시간: {server.responseTime}ms</div>
-                )}
-                {server.statusCode !== undefined && (
-                  <div>상태 코드: {server.statusCode}</div>
-                )}
-              </div>
             </div>
-          ))}
-        </div>
-        
-        <div className="mt-8 pt-4 text-sm text-gray-500 border-t">
-          마지막 확인: {lastCheckedTime}
+            
+            <StatusBar 
+              onlineCount={onlineServersCount} 
+              totalCount={serverStatus.servers.length} 
+              status={serverStatus.status} 
+            />
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {serverStatus.servers.map((server, index) => (
+              <ServerCard
+                key={index}
+                name={server.name}
+                online={server.online}
+                responseTime={server.responseTime}
+                statusCode={server.statusCode}
+              />
+            ))}
+          </div>
+          
+          <footer className="mt-10 pt-6 text-sm text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-gray-700 flex flex-col md:flex-row justify-between items-center">
+            <div>마지막 확인: {lastCheckedTime}</div>
+          </footer>
         </div>
       </div>
+      
+      {/* 하단 데코레이션 */}
+      <div className="absolute bottom-0 inset-x-0 h-40 bg-gradient-to-t from-purple-500/10 to-transparent -z-10" />
     </main>
   );
 }
