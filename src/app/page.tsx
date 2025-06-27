@@ -3,13 +3,13 @@ import type { ServerStatusData } from './api/server-status/route';
 import AutoRefresh from '@/components/AutoRefresh';
 
 export const metadata: Metadata = {
-  title: process.env.APP_NAME || '서버 상태 대시보드',
-  description: '서버 온라인 상태 확인 대시보드',
+  title: process.env.APP_NAME || '서버 상태',
+  description: '내서버에요잉',
   applicationName: process.env.APP_NAME,
   generator: `서버 모니터링 대시보드 v${process.env.APP_VERSION || '1.0.0'}`,
 };
 
-// 최대 30초마다 데이터 재검증 (SSR) - 환경변수에서 가져옴
+// 최대 30초마다 데이터 재검증 (SSR)
 export const revalidate = 30
 
 async function getServerStatus(): Promise<ServerStatusData> {
