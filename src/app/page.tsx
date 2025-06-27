@@ -110,9 +110,6 @@ export default async function HomePage() {
           
           <footer className="mt-6 pt-4 text-xs text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-gray-700 flex flex-col md:flex-row justify-between items-center">
             <div>마지막 확인: {lastCheckedTime}</div>
-            <div className="mt-1 md:mt-0 opacity-70">
-              Powered by Next.js {process.env.APP_VERSION && `v${process.env.APP_VERSION}`}
-            </div>
           </footer>
         </div>
       </div>
