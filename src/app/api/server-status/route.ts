@@ -26,6 +26,10 @@ const servers = [
   { 
     name: process.env.SERVER_3_NAME || 'Server 3', 
     url: process.env.SERVER_3_URL || 'https://example.com'
+  },
+  { 
+    name: process.env.SERVER_4_NAME || 'Server 4', 
+    url: process.env.SERVER_4_URL || 'https://example.com'
   }
 ];
 

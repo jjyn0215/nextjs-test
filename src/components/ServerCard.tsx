@@ -39,16 +39,16 @@ export default function ServerCard({
         `}
       />
       
-      <div className="p-4">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center space-x-3">
+      <div className="p-3">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center space-x-2">
             <StatusIcon status={online ? 'online' : 'offline'} size="sm" />
-            <h3 className="font-medium">{name}</h3>
+            <h3 className="font-medium text-sm">{name}</h3>
           </div>
           
           <span 
             className={`
-              px-3 py-1 rounded-full text-xs font-semibold
+              px-2 py-0.5 rounded-full text-xs font-semibold
               ${online 
                 ? 'text-green-700 bg-green-100 dark:text-green-200 dark:bg-green-900/30' 
                 : 'text-red-700 bg-red-100 dark:text-red-200 dark:bg-red-900/30'
@@ -59,21 +59,21 @@ export default function ServerCard({
           </span>
         </div>
         
-        {/* 항상 표시되는 정보 영역 */}
-        <div className="text-sm text-gray-600 dark:text-gray-300 border-t border-gray-100 dark:border-gray-700 pt-3">
-          <div className="space-y-2">
+        {/* 항상 표시되는 정보 영역 - 컴팩트하게 */}
+        <div className="text-xs text-gray-600 dark:text-gray-300 border-t border-gray-100 dark:border-gray-700 pt-2">
+          <div className="grid grid-cols-2 gap-2">
             {responseTime !== undefined && (
               <div className="flex justify-between items-center">
-                <span>응답 시간</span>
-                <span className="font-mono">{responseTime}ms</span>
+                <span className="text-gray-500">응답 시간</span>
+                <span className="font-mono font-medium">{responseTime}ms</span>
               </div>
             )}
             
             {statusCode !== undefined && (
               <div className="flex justify-between items-center">
-                <span>상태 코드</span>
+                <span className="text-gray-500">상태 코드</span>
                 <span 
-                  className={`font-mono ${
+                  className={`font-mono font-medium ${
                     statusCode >= 200 && statusCode < 300
                       ? 'text-green-600 dark:text-green-400'
                       : statusCode >= 300 && statusCode < 400

@@ -55,28 +55,35 @@ export default async function HomePage() {
       <div className="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-blue-500/10 to-transparent -z-10" />
       
       <div className="w-full max-w-4xl">
-        <div className="relative bg-gradient-to-b from-white to-white/90 dark:from-gray-800 dark:to-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-6 md:p-8 overflow-hidden">
-          {/* 배경 블러 효과 */}
-          <div className="absolute -top-96 -left-32 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-          <div className="absolute -bottom-64 -right-32 w-96 h-96 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob animation-delay-2000"></div>
+        <div className="relative bg-gradient-to-b from-white to-white/90 dark:from-gray-800 dark:to-gray-800/90 backdrop-blur-sm rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-4 md:p-6 overflow-hidden">
+          {/* 배경 블러 효과 - 더 작게 조정 */}
+          <div className="absolute -top-64 -left-32 w-72 h-72 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob"></div>
+          <div className="absolute -bottom-48 -right-24 w-64 h-64 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-5 animate-blob animation-delay-2000"></div>
           
-          <header className="flex flex-col md:flex-row justify-between items-center mb-10">
-            <h1 className="text-4xl font-bold text-center md:text-left bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-400 dark:to-blue-600 bg-clip-text text-transparent">
-              서버 상태
-            </h1>
+          <header className="flex flex-col md:flex-row justify-between items-center mb-6">
+            <div className="flex items-center gap-3">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-400 dark:to-blue-600 bg-clip-text text-transparent">
+                서버 상태
+              </h1>
+              <StatusIndicator status={serverStatus.status} />
+            </div>
+            
+            <div className="mt-4 md:mt-0 text-sm text-gray-500 dark:text-gray-400">
+              {new Date().toLocaleDateString('ko-KR', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })}
+            </div>
           </header>
-          
-          <div className="mb-12 text-center relative">
-            <StatusIndicator status={serverStatus.status} />
-          </div>
 
-          <div className="mb-8 p-5 bg-gray-50 dark:bg-gray-900/50 rounded-xl backdrop-blur-sm shadow-inner">
-            <div className="flex flex-col md:flex-row md:items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold mb-2 md:mb-0">서비스 가용성 요약</h2>
+          <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl backdrop-blur-sm shadow-inner">
+            <div className="flex flex-col md:flex-row md:items-center justify-between mb-3">
+              <h2 className="text-lg font-semibold mb-2 md:mb-0">서비스 가용성 요약</h2>
               
-              <div className="flex items-center bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow-sm">
-                <div className="text-sm text-gray-600 dark:text-gray-300 mr-3">온라인 서비스</div>
-                <div className="text-lg font-bold bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-400 dark:to-blue-600 bg-clip-text text-transparent">
+              <div className="flex items-center bg-white dark:bg-gray-800 px-3 py-1.5 rounded-lg shadow-sm">
+                <div className="text-sm text-gray-600 dark:text-gray-300 mr-2">온라인 서비스</div>
+                <div className="text-base font-bold bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-400 dark:to-blue-600 bg-clip-text text-transparent">
                   {onlineServersCount}/{serverStatus.servers.length}
                 </div>
               </div>
@@ -89,7 +96,7 @@ export default async function HomePage() {
             />
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {serverStatus.servers.map((server, index) => (
               <ServerCard
                 key={index}
@@ -101,8 +108,11 @@ export default async function HomePage() {
             ))}
           </div>
           
-          <footer className="mt-10 pt-6 text-sm text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-gray-700 flex flex-col md:flex-row justify-between items-center">
+          <footer className="mt-6 pt-4 text-xs text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-gray-700 flex flex-col md:flex-row justify-between items-center">
             <div>마지막 확인: {lastCheckedTime}</div>
+            <div className="mt-1 md:mt-0 opacity-70">
+              Powered by Next.js {process.env.APP_VERSION && `v${process.env.APP_VERSION}`}
+            </div>
           </footer>
         </div>
       </div>

@@ -23,12 +23,12 @@ export default function StatusBar({ onlineCount, totalCount, status }: StatusBar
     'shadow-red-500/30';
 
   return (
-    <div className="w-full bg-gray-200 dark:bg-gray-700 h-3 rounded-full overflow-hidden shadow-inner">
+    <div className="w-full bg-gray-200 dark:bg-gray-700 h-2 rounded-full overflow-hidden shadow-inner">
       <motion.div
         initial={{ width: 0 }}
         animate={{ width: `${percentage}%` }}
-        transition={{ duration: 1, ease: "easeOut" }}
-        className={`h-full ${barColor} ${barShadow} shadow-lg relative overflow-hidden`}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className={`h-full ${barColor} ${barShadow} relative overflow-hidden`}
       >
         {/* 움직이는 그래디언트 효과 */}
         <div className="absolute inset-0 bg-white opacity-20 w-20 h-full skew-x-30 animate-shimmer" />

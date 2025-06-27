@@ -37,16 +37,16 @@ export default function StatusIndicator({ status, animate = true }: StatusIndica
       initial={{ scale: 0.9, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className={`relative inline-flex items-center px-6 py-3 rounded-full ${bgColor} ${textColor} text-xl font-bold shadow-lg`}
+      className={`relative inline-flex items-center px-4 py-2 rounded-lg ${bgColor} ${textColor} text-sm font-semibold shadow-md`}
     >
-      <StatusIcon status={status} size="lg" pulse={animate} />
-      <span className="ml-3">{text}</span>
+      <StatusIcon status={status} size="sm" pulse={animate} />
+      <span className="ml-2">{text}</span>
       
-      {/* 배경 글로우 효과 */}
+      {/* 배경 글로우 효과 - 작게 조정 */}
       <div className={`
-        absolute inset-0 -z-10 rounded-full opacity-30
+        absolute inset-0 -z-10 rounded-lg opacity-20
         ${status === 'online' ? 'bg-green-400' : status === 'degraded' ? 'bg-yellow-400' : 'bg-red-400'}
-        blur-lg
+        blur-sm
       `}></div>
     </motion.div>
   );
