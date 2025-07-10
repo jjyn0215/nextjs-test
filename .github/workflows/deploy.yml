@@ -3,6 +3,17 @@ name: Docker Build and Deploy
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      deploy_description:
+        description: '엥????'
+        required: false
+        default: '수동 배포'
+
+# 같은 워크플로우의 새 실행이 시작되면 이전 실행을 취소
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   REGISTRY: ghcr.io
