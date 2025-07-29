@@ -104,6 +104,7 @@ export default async function HomePage() {
                 online={server.online}
                 responseTime={server.responseTime}
                 statusCode={server.statusCode}
+                pingTime={server.pingTime}
               />
             ))}
           </div>

@@ -8,13 +8,15 @@ interface ServerCardProps {
   online: boolean;
   responseTime?: number;
   statusCode?: number;
+  pingTime?: number;
 }
 
 export default function ServerCard({
   name,
   online,
   responseTime,
-  statusCode
+  statusCode,
+  pingTime
 }: ServerCardProps) {
   return (
     <motion.div 
@@ -64,8 +66,15 @@ export default function ServerCard({
           <div className="grid grid-cols-2 gap-2">
             {responseTime !== undefined && (
               <div className="flex justify-between items-center">
-                <span className="text-gray-500">응답 시간</span>
+                <span className="text-gray-500">HTTP 응답</span>
                 <span className="font-mono font-medium">{responseTime}ms</span>
+              </div>
+            )}
+            
+            {pingTime !== undefined && (
+              <div className="flex justify-between items-center">
+                <span className="text-gray-500">왕복 시간(RTT)</span>
+                <span className="font-mono font-medium">{pingTime}ms</span>
               </div>
             )}
             

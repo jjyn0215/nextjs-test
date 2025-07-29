@@ -1,4 +1,9 @@
 import { NextResponse } from 'next/server';
+import dns from 'dns';
+import { promisify } from 'util';
+
+// DNS 조회를 프로미스로 변환
+const lookup = promisify(dns.lookup);
 
 // 서버 상태 타입 정의
 export type ServerStatusData = {
@@ -9,6 +14,7 @@ export type ServerStatusData = {
     online: boolean;
     responseTime?: number; // 응답 시간(ms)
     statusCode?: number;   // HTTP 상태 코드
+    pingTime?: number;     // ICMP Ping 시간(ms)
     lastChecked: string;
   }>;
 };
@@ -36,12 +42,60 @@ const servers = [
 /**
  * HTTP 요청으로 서버 상태를 확인하는 함수
  */
+/**
+ * URL에서 호스트명을 추출하는 함수
+ */
+function extractHostname(url: string): string {
+  try {
+    const { hostname } = new URL(url);
+    return hostname;
+  } catch (error) {
+    console.error(`URL 파싱 오류 (${url}):`, error);
+    return '';
+  }
+}
+
+/**
+ * Ping으로 서버 응답 시간을 확인하는 함수
+ */
+async function pingServer(hostname: string): Promise<{
+  success: boolean;
+  pingTime: number | undefined;
+}> {
+  const startTime = Date.now();
+  
+  try {
+    // DNS 조회를 통해 호스트가 존재하는지 확인
+    await lookup(hostname);
+    const pingTime = Date.now() - startTime;
+    
+    return {
+      success: true,
+      pingTime
+    };
+  } catch (error) {
+    console.error(`Ping 확인 중 오류 발생 (${hostname}):`, error);
+    return {
+      success: false,
+      pingTime: undefined
+    };
+  }
+}
+
 async function checkServerStatus(serverUrl: string): Promise<{
   online: boolean;
   responseTime?: number;
   statusCode?: number;
+  pingTime?: number;
 }> {
   const startTime = Date.now();
+  const hostname = extractHostname(serverUrl);
+  let pingResult = { success: false, pingTime: undefined as number | undefined };
+  
+  // 호스트명이 추출되었으면 ping 시도
+  if (hostname) {
+    pingResult = await pingServer(hostname);
+  }
   
   try {
     // 환경 변수에서 타임아웃 설정 가져오기 (기본값: 5000ms)
@@ -60,12 +114,15 @@ async function checkServerStatus(serverUrl: string): Promise<{
     return {
       online: response.ok,
       responseTime,
-      statusCode: response.status
+      statusCode: response.status,
+      pingTime: pingResult.pingTime
     };
   } catch (error) {
-    console.error(`서버 확인 중 오류 발생 (${serverUrl}):`, error);
+    console.error(`HTTP 확인 중 오류 발생 (${serverUrl}):`, error);
+    // HTTP 연결은 실패했지만 ping이 성공했을 수 있음
     return {
-      online: false
+      online: false,
+      pingTime: pingResult.pingTime
     };
   }
 }
@@ -93,6 +150,7 @@ async function checkAllServers(): Promise<ServerStatusData> {
       online: status.online,
       responseTime: status.responseTime,
       statusCode: status.statusCode,
+      pingTime: status.pingTime,
       lastChecked: formattedDate,
     };
   });
