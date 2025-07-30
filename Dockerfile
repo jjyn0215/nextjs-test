@@ -38,17 +38,8 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
 
-EXPOSE 8080
-ENV PORT=8080
+EXPOSE 3000
+ENV PORT=3000
 ENV HOST=0.0.0.0
 
 CMD ["node", "server.js"]
-
-# Python 앱의 경우 (참고용)
-# FROM python:3.9-slim
-# WORKDIR /app
-# COPY requirements.txt .
-# RUN pip install -r requirements.txt
-# COPY . .
-# EXPOSE 8000
-# CMD ["python", "app.py"]
