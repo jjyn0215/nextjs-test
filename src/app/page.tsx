@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 // 최대 30초마다 데이터 재검증 (SSR)
-export const revalidate = 30
+export const revalidate = 3600
 
 async function getServerStatus(): Promise<ServerStatusData> {
   // 실제 환경에서는 절대 URL 사용
@@ -21,6 +21,7 @@ async function getServerStatus(): Promise<ServerStatusData> {
   // const host = process.env.URL;
   
   const res = await fetch(`http://localhost:3000/api/server-status`, {
+    cache: 'no-store', // 항상 최신 데이터 가져오기
   });
   
   if (!res.ok) {
