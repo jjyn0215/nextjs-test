@@ -20,8 +20,8 @@ async function getServerStatus(): Promise<ServerStatusData> {
   // const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
   // const host = process.env.URL;
   
-  const res = await fetch(`http://localhost:3000/api/server-status`, {
-    cache: 'no-store', // 항상 최신 데이터 가져오기
+  const res = await fetch(`/api/server-status`, {
+    // cache: 'no-store', // 항상 최신 데이터 가져오기
   });
   
   if (!res.ok) {
