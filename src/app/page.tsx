@@ -17,10 +17,10 @@ export const revalidate = 3600
 
 async function getServerStatus(): Promise<ServerStatusData> {
   // 실제 환경에서는 절대 URL 사용
-  // const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
+  const protocol = process.env.NODE_ENV === 'production' ? '' : 'localhost:3000';
   // const host = process.env.URL;
-  
-  const res = await fetch(`/api/server-status`, {
+
+  const res = await fetch(`http://${protocol}/api/server-status`, {
     // cache: 'no-store', // 항상 최신 데이터 가져오기
   });
   
