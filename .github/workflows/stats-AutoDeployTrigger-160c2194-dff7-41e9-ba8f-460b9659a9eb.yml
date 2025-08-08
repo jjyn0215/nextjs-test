@@ -11,7 +11,12 @@ on:
     - '.github/workflows/stats-AutoDeployTrigger-160c2194-dff7-41e9-ba8f-460b9659a9eb.yml'
 
   # Allow manual trigger 
-  workflow_dispatch:      
+  workflow_dispatch:
+    inputs:
+      deploy_description:
+        description: '엥????'
+        required: false
+        default: '수동 배포'
 
 jobs:
   build-and-deploy:
@@ -45,5 +50,6 @@ jobs:
           imageToBuild: ghcr.io/stats:${{ github.sha }}
           _buildArgumentsKey_: |
             _buildArgumentsValues_
+
 
 
