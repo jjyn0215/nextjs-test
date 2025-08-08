@@ -42,8 +42,9 @@ jobs:
           registryPassword: ${{ secrets.STATS_REGISTRY_PASSWORD }}
           containerAppName: stats
           resourceGroup: test
-          imageToBuild: ghcr.io/stats:${{ github.sha }}
+          imageToBuild: jjyn0215/nextjs-test:${{ github.sha }}
           _buildArgumentsKey_: |
             _buildArgumentsValues_
+
 
 
