@@ -66,16 +66,16 @@ jobs:
         uses: azure/container-apps-deploy-action@v2
         with:
           appSourcePath: ${{ github.workspace }}
-          _dockerfilePathKey_: _dockerfilePath_
-          _targetLabelKey_: _targetLabel_
+          # _dockerfilePathKey_: _dockerfilePath_
+          # _targetLabelKey_: _targetLabel_
           registryUrl: ghcr.io
           registryUsername: ${{ secrets.STATS_REGISTRY_USERNAME }}
           registryPassword: ${{ secrets.STATS_REGISTRY_PASSWORD }}
           containerAppName: stats
           resourceGroup: test
           imageToBuild: ghcr.io/${{ github.actor }}/${{ github.repository }}:${{ github.sha }}
-          _buildArgumentsKey_: |
-            _buildArgumentsValues_
+          # _buildArgumentsKey_: |
+          #   _buildArgumentsValues_
 
 
 
