@@ -99,7 +99,7 @@ async function checkServerStatus(serverUrl: string): Promise<{
   
   try {
     // 환경 변수에서 타임아웃 설정 가져오기 (기본값: 5000ms)
-    const timeout = parseInt(process.env.API_TIMEOUT || '5000', 10);
+    const timeout = parseInt(process.env.API_TIMEOUT || '1000', 10);
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
     

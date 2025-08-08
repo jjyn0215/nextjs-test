@@ -11,10 +11,41 @@ on:
     - '.github/workflows/stats-AutoDeployTrigger-e1ae4a33-6082-4a7b-98cc-4094c501a67d.yml'
 
   # Allow manual trigger 
-  workflow_dispatch:      
+  workflow_dispatch:     
+      inputs:
+      deploy_description:
+        description: '힝'
+        required: false
+        default: '수동 배포' 
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run ESLint
+      run: npm run lint
+
   build-and-deploy:
+    needs: lint
     runs-on: ubuntu-latest
     permissions: 
       id-token: write #This is required for requesting the OIDC JWT Token
@@ -42,7 +73,7 @@ jobs:
           registryPassword: ${{ secrets.STATS_REGISTRY_PASSWORD }}
           containerAppName: stats
           resourceGroup: test
-          imageToBuild: ghcr.io/jjyn0215/nextjs-test:${{ github.sha }}
+          imageToBuild: ghcr.io/${{ github.actor }}/${{ github.repository }}:${{ github.sha }}
           _buildArgumentsKey_: |
             _buildArgumentsValues_
 
