@@ -73,9 +73,29 @@ jobs:
           registryPassword: ${{ secrets.STATS_REGISTRY_PASSWORD }}
           containerAppName: stats
           resourceGroup: test
-          imageToBuild: ghcr.io/${{ github.repository }}:latest
+          imageToBuild: ghcr.io/${{ github.repository }}:${{ github.sha }}
           # _buildArgumentsKey_: |
           #   _buildArgumentsValues_
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.STATS_REGISTRY_USERNAME }}
+          password: ${{ secrets.STATS_REGISTRY_PASSWORD }}
+          
+      - name: Tag additional versions
+        run: |
+          # GHCR에 로그인 (이미 action에서 로그인했지만 명시적으로 재로그인)
+          # echo "${{ secrets.STATS_REGISTRY_PASSWORD }}" | docker login ghcr.io -u "${{ secrets.STATS_REGISTRY_USERNAME }}" --password-stdin
+          
+          # 이미 빌드된 이미지에 추가 태그 붙이기
+          docker tag ghcr.io/${{ github.repository }}:${{ github.sha }} ghcr.io/${{ github.repository }}:latest
+          docker tag ghcr.io/${{ github.repository }}:${{ github.sha }} ghcr.io/${{ github.repository }}:${{ github.run_number }}
+          
+          # 추가 태그들을 레지스트리에 푸시
+          docker push ghcr.io/${{ github.repository }}:latest
+          docker push ghcr.io/${{ github.repository }}:${{ github.run_number }}
 
 
 
