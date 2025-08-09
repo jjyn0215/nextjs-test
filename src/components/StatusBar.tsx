@@ -16,11 +16,6 @@ export default function StatusBar({ onlineCount, totalCount, status }: StatusBar
     status === 'online' ? 'bg-gradient-to-r from-green-400 to-green-600' :
     status === 'degraded' ? 'bg-gradient-to-r from-yellow-400 to-amber-500' :
     'bg-gradient-to-r from-red-400 to-red-600';
-    
-  const barShadow = 
-    status === 'online' ? 'shadow-green-500/30' :
-    status === 'degraded' ? 'shadow-yellow-500/30' :
-    'shadow-red-500/30';
 
   return (
     <div className="w-full bg-gray-200 dark:bg-gray-700 h-2 rounded-full overflow-hidden shadow-inner">
@@ -28,10 +23,21 @@ export default function StatusBar({ onlineCount, totalCount, status }: StatusBar
         initial={{ width: 0 }}
         animate={{ width: `${percentage}%` }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className={`h-full ${barColor} ${barShadow} relative overflow-hidden`}
+        className={`h-full ${barColor} rounded-full relative overflow-hidden`}
       >
-        {/* 움직이는 그래디언트 효과 */}
-        <div className="absolute inset-0 bg-white opacity-20 w-20 h-full skew-x-30 animate-shimmer" />
+        {/* 개선된 shimmer 효과 */}
+        <motion.div 
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30"
+          animate={{
+            x: ['-100%', '100%'],
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut",
+            repeatDelay: 1,
+          }}
+        />
       </motion.div>
     </div>
   );
