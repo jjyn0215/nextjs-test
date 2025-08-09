@@ -39,7 +39,7 @@ export default function StatusIndicator({ status, animate = true }: StatusIndica
       transition={{ duration: 0.3 }}
       className={`relative inline-flex items-center px-4 py-2 rounded-lg ${bgColor} ${textColor} text-sm font-semibold shadow-md`}
     >
-      <StatusIcon status={status} size="sm" pulse={animate} />
+      <StatusIcon status={status} size="sm" />
       <span className="ml-2">{text}</span>
       
       {/* 배경 글로우 효과 - 작게 조정 */}
