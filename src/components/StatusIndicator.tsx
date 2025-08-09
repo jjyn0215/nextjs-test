@@ -10,7 +10,7 @@ interface StatusIndicatorProps {
   animate?: boolean;
 }
 
-export default function StatusIndicator({ status, animate = true }: StatusIndicatorProps) {
+export default function StatusIndicator({ status }: StatusIndicatorProps) {
   // 상태별 텍스트 및 색상
   const statusConfig = {
     online: {
