@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Image from 'next/image';
 import type { ServerStatusData } from './api/server-status/route';
 import AutoRefresh from '@/components/AutoRefresh';
 import StatusIndicator from '@/components/StatusIndicator';
@@ -50,9 +51,6 @@ export default async function HomePage() {
     <main className="flex min-h-screen flex-col items-center justify-between p-4 md:p-8 bg-gradient-to-b from-background to-background/80">
       {/* 환경 변수에 설정된 간격으로 클라이언트 사이드에서 데이터 새로고침 */}
       <AutoRefresh interval={parseInt(process.env.CHECK_INTERVAL || '30', 10)} />
-      
-      {/* 상단 데코레이션 */}
-      <div className="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-blue-500/10 to-transparent -z-10" />
       
       <div className="w-full max-w-4xl">
         <div className="relative bg-gradient-to-b from-white to-white/90 dark:from-gray-800 dark:to-gray-800/90 backdrop-blur-sm rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-4 md:p-6 overflow-hidden">
@@ -111,12 +109,21 @@ export default async function HomePage() {
           
           <footer className="mt-6 pt-4 text-xs text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-gray-700 flex flex-col md:flex-row justify-between items-center">
             <div>마지막 확인: {lastCheckedTime}</div>
+            <div className="flex items-center gap-1 mt-2 md:mt-0">
+              <span>Powered by</span>
+              <div className="flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-black to-gray-800 dark:from-white dark:to-gray-200 rounded-md text-white dark:text-black font-medium text-xs shadow-sm">
+                <Image 
+                  src="/next.svg" 
+                  alt="Next.js" 
+                  width={48} 
+                  height={48} 
+                  className="opacity-90 filter invert dark:invert-0"
+                />
+              </div>
+            </div>
           </footer>
         </div>
       </div>
-      
-      {/* 하단 데코레이션 */}
-      <div className="absolute bottom-0 inset-x-0 h-40 bg-gradient-to-t from-purple-500/10 to-transparent -z-10" />
     </main>
   );
 }
