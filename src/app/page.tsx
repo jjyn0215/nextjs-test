@@ -19,7 +19,7 @@ async function getServerStatus(): Promise<ServerStatusData> {
 
   const res = await fetch(`${protocol}://${host}/api/server-status`, {
     next: { revalidate: 30 }, // 30초마다 데이터 재검증
-    // cache: "no-store", // 항상 최신 데이터 가져오기
+    cache: "force-cache",  // 빌드 시점(SSG) 캐시된 응답 사용 (default)
   });
 
   if (!res.ok) {
