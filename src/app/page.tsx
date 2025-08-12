@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 async function getServerStatus(): Promise<ServerStatusData> {
   // 실제 환경에서는 절대 URL 사용
   const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
-  const host = process.env.URL;
+  const host = process.env.URL || "localhost:3000";
 
   const res = await fetch(`${protocol}://${host}/api/server-status`, {
     next: { revalidate: 60 }, // 60초마다 데이터 재검증
