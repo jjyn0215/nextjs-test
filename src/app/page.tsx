@@ -12,16 +12,14 @@ export const metadata: Metadata = {
   generator: `서버 모니터링 대시보드 v${process.env.APP_VERSION || "1.0.0"}`,
 };
 
-// 최대 30초마다 데이터 재검증 (SSR)
-export const revalidate = 30
-
 async function getServerStatus(): Promise<ServerStatusData> {
   // 실제 환경에서는 절대 URL 사용
   const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
   const host = process.env.URL;
 
   const res = await fetch(`${protocol}://${host}/api/server-status`, {
-    cache: "no-store", // 항상 최신 데이터 가져오기
+    next: { revalidate: 60 }, // 60초마다 데이터 재검증
+    // cache: "no-store", // 항상 최신 데이터 가져오기
   });
 
   if (!res.ok) {
