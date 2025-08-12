@@ -1,7 +1,6 @@
 import { Metadata } from "next";
 import Image from "next/image";
 import type { ServerStatusData } from "./api/server-status/route";
-import AutoRefresh from "@/components/AutoRefresh";
 import StatusIndicator from "@/components/StatusIndicator";
 import StatusBar from "@/components/StatusBar";
 import ServerCard from "@/components/ServerCard";
@@ -13,8 +12,8 @@ export const metadata: Metadata = {
   generator: `서버 모니터링 대시보드 v${process.env.APP_VERSION || "1.0.0"}`,
 };
 
-// 최대 3600초마다 데이터 재검증 (SSR)
-// export const revalidate = 3600
+// 최대 30초마다 데이터 재검증 (SSR)
+export const revalidate = 30
 
 async function getServerStatus(): Promise<ServerStatusData> {
   // 실제 환경에서는 절대 URL 사용
@@ -22,7 +21,7 @@ async function getServerStatus(): Promise<ServerStatusData> {
   const host = process.env.URL;
 
   const res = await fetch(`${protocol}://${host}/api/server-status`, {
-    cache: "no-store", // 항상 최신 데이터 가져오기
+    // cache: "", // 항상 최신 데이터 가져오기
   });
 
   if (!res.ok) {
@@ -54,11 +53,6 @@ export default async function HomePage() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-4 md:p-8 bg-gradient-to-b from-background to-background/80">
-      {/* 환경 변수에 설정된 간격으로 클라이언트 사이드에서 데이터 새로고침 */}
-      <AutoRefresh
-        interval={parseInt(process.env.CHECK_INTERVAL || "30", 10)}
-      />
-
       <div className="w-full max-w-4xl">
         <div className="relative bg-gradient-to-b from-white to-white/90 dark:from-gray-800 dark:to-gray-800/90 backdrop-blur-sm rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-4 md:p-6 overflow-hidden">
           {/* 배경 블러 효과 - 더 작게 조정 */}
