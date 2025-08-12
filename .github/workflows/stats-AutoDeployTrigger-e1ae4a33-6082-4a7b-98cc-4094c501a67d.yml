@@ -12,7 +12,7 @@ on:
 
   # Allow manual trigger 
   workflow_dispatch:     
-      inputs:
+    inputs:
       deploy_description:
         description: '힝'
         required: false
