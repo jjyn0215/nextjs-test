@@ -1,21 +1,27 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 
 interface StatusBarProps {
   onlineCount: number;
   totalCount: number;
-  status: 'online' | 'degraded' | 'offline';
+  status: "online" | "degraded" | "offline";
 }
 
-export default function StatusBar({ onlineCount, totalCount, status }: StatusBarProps) {
+export default function StatusBar({
+  onlineCount,
+  totalCount,
+  status,
+}: StatusBarProps) {
   const percentage = totalCount > 0 ? (onlineCount / totalCount) * 100 : 0;
-  
+
   // 상태별 색상
-  const barColor = 
-    status === 'online' ? 'bg-gradient-to-r from-green-400 to-green-600' :
-    status === 'degraded' ? 'bg-gradient-to-r from-yellow-400 to-amber-500' :
-    'bg-gradient-to-r from-red-400 to-red-600';
+  const barColor =
+    status === "online"
+      ? "bg-gradient-to-r from-green-400 to-green-600"
+      : status === "degraded"
+      ? "bg-gradient-to-r from-yellow-400 to-amber-500"
+      : "bg-gradient-to-r from-red-400 to-red-600";
 
   return (
     <div className="w-full bg-gray-200 dark:bg-gray-700 h-2 rounded-full overflow-hidden shadow-inner">
@@ -26,10 +32,10 @@ export default function StatusBar({ onlineCount, totalCount, status }: StatusBar
         className={`h-full ${barColor} rounded-full relative overflow-hidden`}
       >
         {/* 개선된 shimmer 효과 */}
-        <motion.div 
+        <motion.div
           className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30"
           animate={{
-            x: ['-100%', '100%'],
+            x: ["-100%", "100%"],
           }}
           transition={{
             duration: 2,

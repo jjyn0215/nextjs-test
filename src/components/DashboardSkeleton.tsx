@@ -6,7 +6,7 @@ function ServerCardSkeleton() {
         <div className="h-5 bg-gray-300 dark:bg-gray-600 rounded w-32"></div>
         <div className="h-4 w-4 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
       </div>
-      
+
       {/* 상태 정보 스켈레톤 */}
       <div className="space-y-2">
         <div className="flex justify-between">
@@ -40,18 +40,18 @@ export default function DashboardSkeleton() {
           </div>
         </div>
       </header>
-      
+
       <main className="container mx-auto p-6">
         {/* 타이틀 스켈레톤 */}
         <div className="h-9 bg-gray-300 dark:bg-gray-600 rounded w-40 mb-6 animate-pulse"></div>
-        
+
         {/* 카드 그리드 스켈레톤 */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <ServerCardSkeleton key={i} />
           ))}
         </div>
-        
+
         {/* 추가 정보 스켈레톤 */}
         <div className="mt-8 space-y-4">
           <div className="h-6 bg-gray-300 dark:bg-gray-600 rounded w-48 animate-pulse"></div>
