@@ -21,7 +21,7 @@ async function getServerStatus(): Promise<ServerStatusData> {
   const host = process.env.URL;
 
   const res = await fetch(`${protocol}://${host}/api/server-status`, {
-    // cache: "no-store", // 항상 최신 데이터 가져오기
+    cache: "no-store", // 항상 최신 데이터 가져오기
   });
 
   if (!res.ok) {
