@@ -15,10 +15,10 @@ export const metadata: Metadata = {
 async function getServerStatus(): Promise<ServerStatusData> {
   // 실제 환경에서는 절대 URL 사용
   const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
-  const host = process.env.URL || "localhost:3000";
+  const host = process.env.URL
 
   const res = await fetch(`${protocol}://${host}/api/server-status`, {
-    next: { revalidate: 60 }, // 60초마다 데이터 재검증
+    next: { revalidate: 30 }, // 30초마다 데이터 재검증
     // cache: "no-store", // 항상 최신 데이터 가져오기
   });
 
