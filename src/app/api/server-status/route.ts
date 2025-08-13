@@ -39,6 +39,54 @@ const servers = [
   },
 ];
 
+// 캐시 관련 변수들
+let cachedData: ServerStatusData | null = null;
+let lastUpdate = 0;
+let isUpdating = false;
+const CACHE_DURATION = 30000; // 30초 캐시 유효 시간
+const UPDATE_INTERVAL = 60000; // 60초마다 백그라운드 업데이트
+
+// 백그라운드에서 주기적으로 서버 상태를 업데이트하는 함수
+async function updateServerStatusInBackground() {
+  if (isUpdating) {
+    console.log('이미 업데이트 중입니다.');
+    return;
+  }
+
+  isUpdating = true;
+  try {
+    console.log('백그라운드 서버 상태 업데이트 시작:', new Date().toISOString());
+    const newData = await checkAllServers();
+    cachedData = newData;
+    lastUpdate = Date.now();
+    console.log('백그라운드 서버 상태 업데이트 완료:', new Date().toISOString());
+  } catch (error) {
+    console.error('백그라운드 서버 상태 업데이트 실패:', error);
+  } finally {
+    isUpdating = false;
+  }
+}
+
+// 서버 시작 시 즉시 한 번 실행하고 주기적 업데이트 설정
+let updateIntervalId: NodeJS.Timeout | null = null;
+
+// 초기화 함수
+function initializeBackgroundMonitoring() {
+  if (!cachedData && !isUpdating) {
+    console.log('초기 서버 상태 체크 시작');
+    updateServerStatusInBackground();
+  }
+
+  // 이미 인터벌이 설정되어 있지 않다면 새로 설정
+  if (!updateIntervalId) {
+    updateIntervalId = setInterval(updateServerStatusInBackground, UPDATE_INTERVAL);
+    console.log(`백그라운드 모니터링 시작 (${UPDATE_INTERVAL / 1000}초 간격)`);
+  }
+}
+
+// 모듈 로드 시 초기화
+initializeBackgroundMonitoring();
+
 /**
  * HTTP 요청으로 서버 상태를 확인하는 함수
  */
@@ -184,8 +232,19 @@ async function checkAllServers(): Promise<ServerStatusData> {
 }
 
 export async function GET() {
-  // 실제 HTTP 요청으로 서버 상태 확인
+  // 캐시된 데이터가 있고 아직 유효한 경우
+  if (cachedData && (Date.now() - lastUpdate) < CACHE_DURATION) {
+    console.log('캐시된 데이터 반환:', new Date().toISOString());
+    return NextResponse.json(cachedData);
+  }
+
+  // 캐시가 없거나 만료된 경우, 즉시 새로운 데이터 확인
+  console.log('캐시 만료 또는 없음, 새로운 데이터 확인:', new Date().toISOString());
   const data = await checkAllServers();
+  
+  // 새로운 데이터로 캐시 업데이트
+  cachedData = data;
+  lastUpdate = Date.now();
 
   return NextResponse.json(data);
 }
