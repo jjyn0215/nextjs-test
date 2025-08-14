@@ -19,24 +19,12 @@ async function getServerStatus(): Promise<ServerStatusData> {
 
   const res = await fetch(`${host}/api/server-status`, {
     // next: { revalidate: 30 }, // 30초마다 데이터 재검증
-    // cache: "force-cache",     // 예시: 빌드 시점(SSG) 캐시된 응답 사용
+    cache: "no-store",     // 예시: 빌드 시점(SSG) 캐시된 응답 사용
   });
 
   if (!res.ok) {
     // 에러 발생 시 기본값 반환
-    return {
-      status: "offline",
-      servers: [
-        {
-          name: "서버 상태 확인 불가",
-          online: false,
-          lastChecked: new Date()
-            .toISOString()
-            .replace("T", " ")
-            .substring(0, 19),
-        },
-      ],
-    };
+    throw new Error("API 요청 실패");
   }
 
   return res.json();
